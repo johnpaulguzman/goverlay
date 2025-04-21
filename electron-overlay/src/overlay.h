@@ -816,7 +816,7 @@ class OverlayMain : public IIpcHost
         }
     }
 
-    void notifyInputEvent(std::uint32_t pid, std::uint32_t windowId, std::uint32_t msg, std::uint32_t wparam, std::uint32_t lparam)
+    void notifyInputEvent(std::uint32_t pid, std::uint32_t windowId, std::uint32_t msg, std::uint32_t wparam, std::uint32_t lparam, std::uint32_t x, std::uint32_t y)
     {
         if (eventCallback_)
         {
@@ -827,6 +827,8 @@ class OverlayMain : public IIpcHost
             object.Set("msg", Napi::Value::From(eventCallback_->env, msg));
             object.Set("wparam", Napi::Value::From(eventCallback_->env, wparam));
             object.Set("lparam", Napi::Value::From(eventCallback_->env, lparam));
+            object.Set("x", Napi::Value::From(eventCallback_->env, x ? x : 0));
+            object.Set("y", Napi::Value::From(eventCallback_->env, y ? y : 0));
             eventCallback_->callback.MakeCallback(eventCallback_->receiver.Value(), { Napi::Value::From(eventCallback_->env, "game.input"), object });
         }
     }
@@ -922,6 +924,22 @@ class OverlayMain : public IIpcHost
         }
     }
 
+    void notifyWindowBounds(std::uint32_t pid, std::uint32_t windowId, int x, int y, int width, int height)
+{
+    if (eventCallback_)
+    {
+        Napi::HandleScope scope(eventCallback_->env);
+        Napi::Object object = Napi::Object::New(eventCallback_->env);
+        object.Set("pid", Napi::Value::From(eventCallback_->env, pid));
+        object.Set("windowId", Napi::Value::From(eventCallback_->env, windowId));
+        object.Set("x", Napi::Value::From(eventCallback_->env, x));
+        object.Set("y", Napi::Value::From(eventCallback_->env, y));
+        object.Set("width", Napi::Value::From(eventCallback_->env, width));
+        object.Set("height", Napi::Value::From(eventCallback_->env, height));
+        eventCallback_->callback.MakeCallback(eventCallback_->receiver.Value(), { Napi::Value::From(eventCallback_->env, "window.bounds"), object });
+    }
+}
+
   private:
     void _makeCallback()
     {
@@ -1000,6 +1018,7 @@ break;
                 OVERLAY_DISPATCH("graphics.fps", GraphicsFps);
                 OVERLAY_DISPATCH("game.hotkey.down", InGameHotkeyDown);
                 OVERLAY_DISPATCH("game.window.focused", InGameWindowFocused);
+                OVERLAY_DISPATCH("window.bounds", WindowBounds);
             default:
                 break;
             }
@@ -1047,7 +1066,7 @@ break;
     void _onGameInput(std::uint32_t pid, const std::shared_ptr<overlay::GameInput>& overlayMsg)
     {
         node_async_call::async_call([this, pid, overlayMsg]() {
-            notifyInputEvent(pid, overlayMsg->windowId, overlayMsg->msg, overlayMsg->wparam, overlayMsg->lparam);
+            notifyInputEvent(pid, overlayMsg->windowId, overlayMsg->msg, overlayMsg->wparam, overlayMsg->lparam, overlayMsg->x, overlayMsg->y);
         });
     }
 
@@ -1097,6 +1116,13 @@ break;
     {
         node_async_call::async_call([this, pid, overlayMsg]() {
             notifyInGameWindowFocused(pid, overlayMsg->focusWindowId);
+        });
+    }
+
+    void _onWindowBounds(std::uint32_t pid, const std::shared_ptr<overlay::WindowBounds>& overlayMsg)
+    {
+        node_async_call::async_call([this, pid, overlayMsg]() {
+            notifyWindowBounds(pid, overlayMsg->windowId, overlayMsg->rect.x, overlayMsg->rect.y, overlayMsg->rect.width, overlayMsg->rect.height);
         });
     }
 };

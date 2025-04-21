@@ -1,4 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /// <reference types="node" />
+
+
 declare module "electron-overlay" {
 
     interface IHotkey{
