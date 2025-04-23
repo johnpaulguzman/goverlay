@@ -11,9 +11,10 @@
   "types": "./index.d.ts",
   "scripts": {
     "build:dll": "cd game-overlay/sln && build",
-    "build:addon:x86": "npm run copy_binary && (cmake-js -G \"Visual Studio 17 2022\" -A Win32 -O build_Win32)",
-    "build:addon:x64": "npm run copy_binary && (cmake-js -G \"Visual Studio 17 2022\" -A x64 -O build_x64)",
-    "copy_binary": "copy_binary.bat"
+    "build:addon:x86": "npm run codesign && npm run copy_binary && (cmake-js -G \"Visual Studio 17 2022\" -A Win32 -O build_Win32)",
+    "build:addon:x64": "npm run codesign && npm run copy_binary && (cmake-js -G \"Visual Studio 17 2022\" -A x64 -O build_x64)",
+    "copy_binary": "copy_binary.bat",
+    "codesign": "codesign.bat"
   },
   "dependencies": {
     "node-addon-api": "^7.1.0"

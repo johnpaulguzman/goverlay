@@ -1,0 +1,4 @@
+signtool sign /tr http://time.certum.pl /td sha256 /fd sha256 /d "Trials" /du "https://www.trials.gg" /n "Robinson Legaspi" /v .\game-overlay\prebuilt\n_overlay.dll
+signtool sign /tr http://time.certum.pl /td sha256 /fd sha256 /d "Trials" /du "https://www.trials.gg" /n "Robinson Legaspi" /v .\game-overlay\prebuilt\n_overlay.x64.dll
+signtool sign /tr http://time.certum.pl /td sha256 /fd sha256 /d "Trials" /du "https://www.trials.gg" /n "Robinson Legaspi" /v .\game-overlay\prebuilt\injector_helper.exe
+signtool sign /tr http://time.certum.pl /td sha256 /fd sha256 /d "Trials" /du "https://www.trials.gg" /n "Robinson Legaspi" /v .\game-overlay\prebuilt\injector_helper.x64.exe
